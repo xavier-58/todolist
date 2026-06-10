@@ -6,19 +6,7 @@ import { hasEnvVars } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 import { mapTodoRow, type Todo, type TodoRow } from "@/lib/todo";
 
-export default async function Home() {
-  const authSlot = !hasEnvVars ? (
-    <EnvVarWarning />
-  ) : (
-    <Suspense>
-      <AuthButton />
-    </Suspense>
-  );
-
-  if (!hasEnvVars) {
-    return <HomePageClient authSlot={authSlot} initialTodos={[]} canEdit={false} userId={null} />;
-  }
-
+async function HomeContent({ authSlot }: { authSlot: React.ReactNode }) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -42,5 +30,25 @@ export default async function Home() {
       canEdit={Boolean(user)}
       userId={user?.id ?? null}
     />
+  );
+}
+
+export default function Home() {
+  const authSlot = !hasEnvVars ? (
+    <EnvVarWarning />
+  ) : (
+    <Suspense>
+      <AuthButton />
+    </Suspense>
+  );
+
+  if (!hasEnvVars) {
+    return <HomePageClient authSlot={authSlot} initialTodos={[]} canEdit={false} userId={null} />;
+  }
+
+  return (
+    <Suspense>
+      <HomeContent authSlot={authSlot} />
+    </Suspense>
   );
 }

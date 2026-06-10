@@ -5,7 +5,7 @@ import { HomePageClient } from "@/components/home-page-client";
 import { createClient } from "@/lib/supabase/server";
 import { mapTodoRow, type TodoRow } from "@/lib/todo";
 
-export default async function ProtectedPage() {
+async function ProtectedPageContent() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -31,5 +31,13 @@ export default async function ProtectedPage() {
       canEdit={true}
       userId={user.id}
     />
+  );
+}
+
+export default function ProtectedPage() {
+  return (
+    <Suspense>
+      <ProtectedPageContent />
+    </Suspense>
   );
 }

@@ -282,20 +282,20 @@ export function HomePageClient({
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          const realtimePayload = payload as TodoRealtimePayload;
+          const deletedId = (payload.old as Partial<TodoRow> | null)?.id;
+          const nextRow = payload.new as TodoRow | null;
 
           setTodos((prev) => {
-            if (realtimePayload.eventType === "DELETE") {
-              const deletedId = realtimePayload.old?.id;
+            if (payload.eventType === "DELETE") {
               if (!deletedId) return prev;
               return prev.filter((todo) => todo.id !== deletedId);
             }
 
-            if (!realtimePayload.new) {
+            if (!nextRow) {
               return prev;
             }
 
-            return sortTodosByCreatedAt(upsertTodo(prev, realtimePayload.new));
+            return sortTodosByCreatedAt(upsertTodo(prev, nextRow));
           });
         },
       )
